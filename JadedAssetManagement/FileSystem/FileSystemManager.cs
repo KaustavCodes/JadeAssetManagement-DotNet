@@ -59,4 +59,9 @@ public class FileSystemManager : IFileSystemBase
     {
         throw new NotImplementedException();
     }
+
+    public Task<AssetTypes> GetFileAsync(string filePath)
+    {
+        throw new NotImplementedException();
+    }
 }

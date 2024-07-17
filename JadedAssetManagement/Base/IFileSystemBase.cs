@@ -21,5 +21,7 @@ public interface IFileSystemBase
     Task<IEnumerable<AssetTypes>> ListFilesAsync(int currentPage);
 
     // Lists all files in the specified path or directory with a specific page size.
-    Task<IEnumerable<AssetTypes>> ListFilesAsync(int currentPage, int pgSize);
+    Task<IEnumerable<AssetTypes>> ListFilesAsync(int currentPage, int pgSize, string searchKey = "");
+
+    Task<AssetTypes> GetFileAsync(string filePath);
 }
