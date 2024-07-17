@@ -12,7 +12,7 @@ public class AssetTypes
 
     public string MimeType { get; set; }
 
-    public string MyProperty { get; set; }
+    public int SizeInBytes { get; set; }
 
     public DateTime DateCreated { get; set; }
 
