@@ -7,6 +7,8 @@ public class FileSystemManager : IFileSystemBase
 {
     private int _pageSize = 10;
 
+    private string _rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
     /// <summary>
     /// This constructor accepts a dynamic object and expects a parameter called PageSize.
     /// </summary>
@@ -15,15 +17,20 @@ public class FileSystemManager : IFileSystemBase
     {
         if (configuration.PageSize != null)
             _pageSize = configuration.PageSize;
+        
+        if (configuration.RootPath != null)
+            _rootPath = configuration.RootPath;
     }
 
     public FileSystemManager(IConfiguration configuration)
     {
         _pageSize = Convert.ToInt32(configuration["ByteFiles:PageSize"]);
+        _rootPath = configuration["ByteFiles:RootPath"].ToString();
     }
 
-    public async Task DeleteDirectoryAsync(string directoryPath)
+    public async Task DeleteDirectoryAsync(string relativeDirectoryPath)
     {
+        var directoryPath = Path.Combine(_rootPath, relativeDirectoryPath);
         if (Directory.Exists(directoryPath))
         {
             Directory.Delete(directoryPath, true);
@@ -35,8 +42,9 @@ public class FileSystemManager : IFileSystemBase
         }
     }
 
-    public async Task DeleteFileAsync(string filePath)
+    public async Task DeleteFileAsync(string relateiveFilePath)
     {
+        var filePath = Path.Combine(_rootPath, relateiveFilePath);
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
@@ -48,8 +56,9 @@ public class FileSystemManager : IFileSystemBase
         }
     }
 
-    public async Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string path)
+    public async Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "/", string searchKey = "")
     {
+        var path = Path.Combine(_rootPath, relativePath);
         if (!Directory.Exists(path))
         {
             throw new DirectoryNotFoundException($"The directory '{path}' was not found.");
@@ -60,7 +69,7 @@ public class FileSystemManager : IFileSystemBase
         // Add directories to the list
         foreach (var directoryPath in Directory.GetDirectories(path))
         {
-        DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
+            DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
             assetList.Add(new AssetTypes
             {
                 Name = dirInfo.Name,
@@ -74,8 +83,11 @@ public class FileSystemManager : IFileSystemBase
             });
         }
 
-        // Add files to the list
-        foreach (var filePath in Directory.GetFiles(path))
+        var searchPattern = string.IsNullOrEmpty(searchKey) ? "*" : $"*{searchKey}*";
+
+
+        // Add files to the list sorting it by name ascending
+        foreach (var filePath in Directory.GetFiles(path, searchPattern).OrderBy(f => f))
         {
             FileInfo fileInfo = new FileInfo(filePath);
             assetList.Add(new AssetTypes
@@ -94,22 +106,65 @@ public class FileSystemManager : IFileSystemBase
         return await Task.FromResult(assetList);
     }
 
-    public Task<IEnumerable<AssetTypes>> ListFilesAsync(string path, int currentPage)
+    public async Task<IEnumerable<AssetTypes>> ListFilesPaged(string relativePath, int currentPage, string searchKey = "", int pageSize = 0)
+    {
+        var path = Path.Combine(_rootPath, relativePath);
+        if (!Directory.Exists(path))
+        {
+            throw new DirectoryNotFoundException($"The directory '{path}' was not found.");
+        }
+
+        var assetList = new List<AssetTypes>();
+
+        // Add directories to the list
+        foreach (var directoryPath in Directory.GetDirectories(path))
+        {
+            DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
+            assetList.Add(new AssetTypes
+            {
+                Name = dirInfo.Name,
+                IsFolder = true,
+                Path = dirInfo.FullName,
+                Extension = "",
+                MimeType = "directory/folder",
+                SizeInBytes = 0, // Directories themselves don't have a size
+                DateCreated = dirInfo.CreationTime,
+                DateModified = dirInfo.LastWriteTime
+            });
+        }
+
+        int pgSize = (pageSize > 0 ? pageSize : _pageSize);
+
+        int skip = (currentPage - 1) * pgSize;
+
+        var searchPattern = string.IsNullOrEmpty(searchKey) ? "*" : $"*{searchKey}*";
+
+        // Add files to the list sorting it by name ascending
+        foreach (var filePath in Directory.GetFiles(path, searchPattern).Skip(skip).Take(pgSize).OrderBy(f => f))
+        {
+            FileInfo fileInfo = new FileInfo(filePath);
+            assetList.Add(new AssetTypes
+            {
+                Name = fileInfo.Name,
+                IsFolder = false,
+                Path = fileInfo.FullName,
+                Extension = fileInfo.Extension,
+                MimeType = Helpers.GetMimeType(fileInfo.Extension),
+                SizeInBytes = (int)fileInfo.Length, // This might need adjustment for large files
+                DateCreated = fileInfo.CreationTime,
+                DateModified = fileInfo.LastWriteTime
+            });
+        }
+
+        return await Task.FromResult(assetList);
+    }
+
+    public Task UploadFileAsync(byte[] fileContent, string relativeFilePath, string destination)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<AssetTypes>> ListFilesAsync(int currentPage, int pgSize, string searchKey = "")
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UploadFileAsync(byte[] fileContent, string filePath, string destination)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<AssetTypes> GetFileAsync(string filePath)
+    public Task<AssetTypes> GetFileAsync(string relativeFilePath)
     {
         throw new NotImplementedException();
     }
