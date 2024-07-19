@@ -1,10 +1,10 @@
-# BytesAssetManagement
+# Jaded Asset Management
 
-[![.NET](https://github.com/YourGitHubUsername/BytesAssetManagement/actions/workflows/dotnet.yml/badge.svg)](https://github.com/YourGitHubUsername/BytesAssetManagement/actions/workflows/dotnet.yml)
-[![Nuget](https://img.shields.io/nuget/v/BytesAssetManagement.svg)](https://www.nuget.org/packages/BytesAssetManagement) 
+[![.NET](https://github.com/YourGitHubUsername/JadedAssetManagement/actions/workflows/dotnet.yml/badge.svg)](https://github.com/YourGitHubUsername/JadedAssetManagement/actions/workflows/dotnet.yml)
+[![Nuget](https://img.shields.io/nuget/v/JadedAssetManagement.svg)](https://www.nuget.org/packages/JadedAssetManagement) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-BytesAssetManagement is a powerful, unified asset management library built on .NET 8.  Simplify the way you store and manage your images and files across a variety of storage platforms with a single, intuitive module.
+JadedAssetManagement is a powerful, unified asset management library built on .NET 8.  Simplify the way you store and manage your images and files across a variety of storage platforms with a single, intuitive module.
 
 **Key Features (Coming Soon):**
 
@@ -17,7 +17,7 @@ BytesAssetManagement is a powerful, unified asset management library built on .N
 
 ## Project Status
 
-BytesAssetManagement is currently under active development. Stay tuned for exciting updates and releases!
+JadedAssetManagement is currently under active development. Stay tuned for exciting updates and releases!
 
 **Roadmap:**
 
@@ -32,7 +32,7 @@ BytesAssetManagement is currently under active development. Stay tuned for excit
 // Placeholder for future installation instructions
 
 // For NuGet Package installation from Package Manager Console
-Install-Package BytesAssetManagement
+Install-Package JadedAssetManagement
 
 // For .Net CLI installation
-dotnet add package BytesAssetManagement
+dotnet add package JadedAssetManagement
