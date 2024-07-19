@@ -5,7 +5,7 @@ namespace JadedAssetManagement.Base;
 public interface IFileSystemBase
 {
     // Uploads a file to the specified destination.
-    Task UploadFileAsync(byte[] fileContent, string relativeFilePath, string destination);
+    Task<bool> UploadFileAsync(byte[] fileContent, string relativeDestinationPath);
 
     // Deletes a file from the specified path.
     Task DeleteFileAsync(string relativeFilePath);

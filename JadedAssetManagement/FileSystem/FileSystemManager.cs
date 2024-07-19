@@ -159,13 +159,63 @@ public class FileSystemManager : IFileSystemBase
         return await Task.FromResult(assetList);
     }
 
-    public Task UploadFileAsync(byte[] fileContent, string relativeFilePath, string destination)
+    public async Task<bool> UploadFileAsync(byte[] fileContent, string relativeDestinationPath)
     {
-        throw new NotImplementedException();
+        try
+        {
+            // Determine the absolute path where the file will be saved
+            string destinationPath = Path.Combine(_rootPath, relativeDestinationPath);
+
+            // Ensure the destination directory exists
+            string destinationDirectory = Path.GetDirectoryName(destinationPath);
+            if (!Directory.Exists(destinationDirectory))
+            {
+                Directory.CreateDirectory(destinationDirectory);
+            }
+
+            // Save the file asynchronously
+            await File.WriteAllBytesAsync(destinationPath, fileContent);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
 
-    public Task<AssetTypes> GetFileAsync(string relativeFilePath)
+    public async Task<AssetTypes> GetFileAsync(string relativeFilePath)
     {
-        throw new NotImplementedException();
+        var path = Path.Combine(_rootPath, relativeFilePath);
+
+        try
+        {
+            // Get file information
+            FileInfo fileInfo = new FileInfo(path);
+
+            // Check if the file exists
+            if (!fileInfo.Exists)
+            {
+                return null;
+            }
+
+            // Create and return the AssetTypes object
+            return new AssetTypes
+            {
+                Name = fileInfo.Name,
+                IsFolder = false,
+                Path = fileInfo.FullName,
+                Extension = fileInfo.Extension,
+                MimeType = Helpers.GetMimeType(fileInfo.Extension),
+                SizeInBytes = (int)fileInfo.Length, // This might need adjustment for large files
+                DateCreated = fileInfo.CreationTime,
+                DateModified = fileInfo.LastWriteTime
+            };
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
+
     }
 }
