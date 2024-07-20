@@ -82,9 +82,10 @@ public class FileSystemManager : IFileSystemBase
         }
 
         var assetList = new List<AssetTypes>();
+        var searchPattern = string.IsNullOrEmpty(searchKey) ? "*" : $"*{searchKey}*";
 
         // Add directories to the list
-        foreach (var directoryPath in Directory.GetDirectories(path))
+        foreach (var directoryPath in Directory.GetDirectories(path, searchPattern))
         {
             DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
             assetList.Add(new AssetTypes
@@ -99,8 +100,6 @@ public class FileSystemManager : IFileSystemBase
                 DateModified = dirInfo.LastWriteTime
             });
         }
-
-        var searchPattern = string.IsNullOrEmpty(searchKey) ? "*" : $"*{searchKey}*";
 
 
         // Add files to the list sorting it by name ascending
@@ -133,8 +132,10 @@ public class FileSystemManager : IFileSystemBase
 
         var assetList = new List<AssetTypes>();
 
+        var searchPattern = string.IsNullOrEmpty(searchKey) ? "*" : $"*{searchKey}*";
+
         // Add directories to the list
-        foreach (var directoryPath in Directory.GetDirectories(path))
+        foreach (var directoryPath in Directory.GetDirectories(path, searchPattern))
         {
             DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
             assetList.Add(new AssetTypes
@@ -154,7 +155,7 @@ public class FileSystemManager : IFileSystemBase
 
         int skip = (currentPage - 1) * pgSize;
 
-        var searchPattern = string.IsNullOrEmpty(searchKey) ? "*" : $"*{searchKey}*";
+        
 
         // Add files to the list sorting it by name ascending
         foreach (var filePath in Directory.GetFiles(path, searchPattern).Skip(skip).Take(pgSize).OrderBy(f => f))

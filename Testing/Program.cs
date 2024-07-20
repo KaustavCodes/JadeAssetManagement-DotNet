@@ -58,6 +58,13 @@ foreach (var file in searchedFiles)
     Console.WriteLine(file.Name + " (" + file.Path + ")");
 }
 
+
+//Upload File Testing
+byte[] fileContent = File.ReadAllBytes("SourceFiles/uplaodFile.png");
+bool isUploaded = await fileSystemManager.UploadFileAsync(fileContent, "uploadedFile.png");
+Console.WriteLine("");
+Console.WriteLine("File Upload Status: " + isUploaded);
+
 // //File Deletion Testing
 // bool isDeleted = await fileSystemManager.DeleteFileAsync("Delete/singleDelete.jpg");
 
