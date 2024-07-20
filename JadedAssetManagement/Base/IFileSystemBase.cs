@@ -8,10 +8,10 @@ public interface IFileSystemBase
     Task<bool> UploadFileAsync(byte[] fileContent, string relativeDestinationPath);
 
     // Deletes a file from the specified path.
-    Task DeleteFileAsync(string relativeFilePath);
+    Task<bool> DeleteFileAsync(string relativeFilePath);
 
     // Deletes a directory from the specified path.
-    Task DeleteDirectoryAsync(string relativeDirectoryPath);
+    Task<bool> DeleteDirectoryAsync(string relativeDirectoryPath);
 
     Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "/", string searchKey = "");
     // Lists all files in the specified path or directory.

@@ -28,31 +28,48 @@ public class FileSystemManager : IFileSystemBase
         _rootPath = configuration["ByteFiles:RootPath"].ToString();
     }
 
-    public async Task DeleteDirectoryAsync(string relativeDirectoryPath)
+    public async Task<bool> DeleteDirectoryAsync(string relativeDirectoryPath)
     {
         var directoryPath = Path.Combine(_rootPath, relativeDirectoryPath);
-        if (Directory.Exists(directoryPath))
+
+        try
         {
-            Directory.Delete(directoryPath, true);
-            await Task.CompletedTask;
+            if (Directory.Exists(directoryPath))
+            {
+                Directory.Delete(directoryPath, true);
+                await Task.CompletedTask;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+        catch(Exception ex)
         {
             throw new DirectoryNotFoundException($"The directory '{directoryPath}' was not found.");
         }
     }
 
-    public async Task DeleteFileAsync(string relateiveFilePath)
+    public async Task<bool> DeleteFileAsync(string relateiveFilePath)
     {
         var filePath = Path.Combine(_rootPath, relateiveFilePath);
-        if (File.Exists(filePath))
+        try
         {
-            File.Delete(filePath);
-            await Task.CompletedTask;
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+                await Task.CompletedTask;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+        catch
         {
-            throw new FileNotFoundException($"The file '{filePath}' was not found.");
+            throw new FileNotFoundException($"The directory '{filePath}' was not found.");
         }
     }
 

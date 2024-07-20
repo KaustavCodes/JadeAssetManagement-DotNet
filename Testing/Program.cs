@@ -48,3 +48,23 @@ foreach (var file in pagedFiles2)
 {
     Console.WriteLine(file.Name + " (" + file.Path + ")");
 }
+
+
+var searchedFiles = await fileSystemManager.ListFilesPaged("", 1, "searchme");
+Console.WriteLine("");
+Console.WriteLine("Serch File Listing Paged : Looking for file with name searchme:");
+foreach (var file in searchedFiles)
+{
+    Console.WriteLine(file.Name + " (" + file.Path + ")");
+}
+
+// //File Deletion Testing
+// bool isDeleted = await fileSystemManager.DeleteFileAsync("Delete/singleDelete.jpg");
+
+// Console.WriteLine("File Delete Status: " + isDeleted);
+
+
+// //Directory Deletion Testing
+// bool isDirectoryDeleted = await fileSystemManager.DeleteDirectoryAsync("Delete");
+// Console.WriteLine("Directory Delete Status: " + isDirectoryDeleted);
+
