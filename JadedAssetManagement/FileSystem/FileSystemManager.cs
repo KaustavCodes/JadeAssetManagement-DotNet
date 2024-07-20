@@ -13,7 +13,7 @@ public class FileSystemManager : IFileSystemBase
     /// This constructor accepts a dynamic object and expects a parameter called PageSize.
     /// </summary>
     /// <param name="configuration">PageSize as integer. eg 10</param>
-    public FileSystemManager(dynamic configuration)
+    public FileSystemManager(FileSystemConfig configuration)
     {
         if (configuration.PageSize != null)
             _pageSize = configuration.PageSize;
@@ -56,7 +56,7 @@ public class FileSystemManager : IFileSystemBase
         }
     }
 
-    public async Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "/", string searchKey = "")
+    public async Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "", string searchKey = "")
     {
         var path = Path.Combine(_rootPath, relativePath);
         if (!Directory.Exists(path))
