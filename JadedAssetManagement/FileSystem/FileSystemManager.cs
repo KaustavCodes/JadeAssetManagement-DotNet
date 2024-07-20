@@ -24,8 +24,8 @@ public class FileSystemManager : IFileSystemBase
 
     public FileSystemManager(IConfiguration configuration)
     {
-        _pageSize = Convert.ToInt32(configuration["ByteFiles:PageSize"]);
-        _rootPath = configuration["ByteFiles:RootPath"].ToString();
+        _pageSize = Convert.ToInt32(configuration["JadedFileSystemConfig:PageSize"]);
+        _rootPath = configuration["JadedFileSystemConfig:RootPath"].ToString();
     }
 
     public async Task<bool> DeleteDirectoryAsync(string relativeDirectoryPath)
