@@ -5,13 +5,13 @@ using Microsoft.Extensions.Configuration;
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Jaded File Manager!");
 
-// var configuration = new FileSystemConfig()
-// {
-//     PageSize = 20,
-//     RootPath = Path.Combine(Directory.GetCurrentDirectory(), "Files")
-// };
+var configuration = new FileSystemConfig()
+{
+    PageSize = 20,
+    RootPath = Path.Combine(Directory.GetCurrentDirectory(), "Files")
+};
 
-// FileSystemManager fileSystemManager = new(configuration);
+FileSystemManager fileSystemManager = new(configuration);
 
 var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -72,13 +72,13 @@ bool isUploaded = await fileSystemManager.UploadFileAsync(fileContent, "uploaded
 Console.WriteLine("");
 Console.WriteLine("File Upload Status: " + isUploaded);
 
-// //File Deletion Testing
-// bool isDeleted = await fileSystemManager.DeleteFileAsync("Delete/singleDelete.jpg");
+//File Deletion Testing
+bool isDeleted = await fileSystemManager.DeleteFileAsync("Delete/singleDelete.jpg");
 
-// Console.WriteLine("File Delete Status: " + isDeleted);
+Console.WriteLine("File Delete Status: " + isDeleted);
 
 
-// //Directory Deletion Testing
-// bool isDirectoryDeleted = await fileSystemManager.DeleteDirectoryAsync("Delete");
-// Console.WriteLine("Directory Delete Status: " + isDirectoryDeleted);
+//Directory Deletion Testing
+bool isDirectoryDeleted = await fileSystemManager.DeleteDirectoryAsync("Delete");
+Console.WriteLine("Directory Delete Status: " + isDirectoryDeleted);
 

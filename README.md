@@ -26,10 +26,56 @@ JadedAssetManagement is currently under active development. Stay tuned for excit
 3. **Azure Storage:** Add support for Azure storage solutions.
 4. **Google Cloud Platform Storage:** Complete the suite with Google Cloud integration.
 
-## Getting Started (Coming Soon)
+## Usage
 
+### Basic Setup
+
+```csharp
+var configuration = new FileSystemConfig() 
+{
+    PageSize = 20,
+    RootPath = Path.Combine(Directory.GetCurrentDirectory(), "Files")
+};
+FileSystemManager fileSystemManager = new(configuration);
+
+
+Alternative method to instanciate the class:
 ```bash
-// Placeholder for future installation instructions
+var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+FileSystemManager fileSystemManager = new FileSystemManager(configuration);
+
+
+## File Listing
+```bash
+// All Files
+var files = await fileSystemManager.ListFilesAllFiles();
+
+// Single File
+AssetTypes singleFile = await fileSystemManager.GetFileAsync("test2.png");
+
+// Paged Listing
+var pagedFiles = await fileSystemManager.ListFilesPaged("", 1, "", 1); // Page 1
+var pagedFiles2 = await fileSystemManager.ListFilesPaged("", 2, "", 1); // Page 2
+
+
+## File Upload
+```bash
+byte[] fileContent = File.ReadAllBytes("SourceFiles/uplaodFile.png");
+bool isUploaded = await fileSystemManager.UploadFileAsync(fileContent, "uploadedFile.png");
+
+
+## File & Directory Deletions
+```bash
+bool isDeleted = await fileSystemManager.DeleteFileAsync("Delete/singleDelete.jpg");
+bool isDirectoryDeleted = await fileSystemManager.DeleteDirectoryAsync("Delete");
+
+
+
+## Important Note
+
 
 // For NuGet Package installation from Package Manager Console
 Install-Package JadedAssetManagement
