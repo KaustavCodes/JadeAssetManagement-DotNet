@@ -1,8 +1,12 @@
 using JadedAssetManagement.Base;
 using Microsoft.Extensions.Configuration;
+using Amazon.S3;
+
+namespace JadedAssetManagement.AwsFileSystem;
 
 public class AwsFileSystemManager : IFileSystemBase
 {
+    private readonly AmazonS3Client _s3Client;
     private int _pageSize = 10;
 
     private string _rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -11,7 +15,7 @@ public class AwsFileSystemManager : IFileSystemBase
     /// This constructor accepts a dynamic object and expects a parameter called PageSize.
     /// </summary>
     /// <param name="configuration">PageSize as integer. eg 10</param>
-    public AwsFileSystemManager(FileSystemConfig configuration)
+    public AwsFileSystemManager(AwsFileSystemConfig configuration)
     {
         if (configuration.PageSize != null)
             _pageSize = configuration.PageSize;
