@@ -30,7 +30,7 @@ JadedAssetManagement is currently under active development. Stay tuned for excit
 
 ### Basic Setup
 
-```csharp
+```bash
 var configuration = new FileSystemConfig() 
 {
     PageSize = 20,
@@ -49,14 +49,17 @@ FileSystemManager fileSystemManager = new FileSystemManager(configuration);
 
 
 ## File Listing
+### All Files
 ```bash
-// All Files
 var files = await fileSystemManager.ListFilesAllFiles();
 
-// Single File
+
+### Single File
+```bash
 AssetTypes singleFile = await fileSystemManager.GetFileAsync("test2.png");
 
-// Paged Listing
+### Paged Listing
+```bash
 var pagedFiles = await fileSystemManager.ListFilesPaged("", 1, "", 1); // Page 1
 var pagedFiles2 = await fileSystemManager.ListFilesPaged("", 2, "", 1); // Page 2
 
