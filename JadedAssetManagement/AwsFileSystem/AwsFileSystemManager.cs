@@ -1,12 +1,14 @@
 using JadedAssetManagement.Base;
 using Microsoft.Extensions.Configuration;
 using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace JadedAssetManagement.AwsFileSystem;
 
 public class AwsFileSystemManager : IFileSystemBase
 {
     private readonly AmazonS3Client _s3Client;
+    private readonly string _bucketName;
     private int _pageSize = 10;
 
     private string _rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -22,6 +24,9 @@ public class AwsFileSystemManager : IFileSystemBase
         
         if (configuration.RootPath != null)
             _rootPath = configuration.RootPath;
+        
+        _s3Client = new AmazonS3Client(configuration.AccessKey, configuration.SecretKey, Amazon.RegionEndpoint.GetBySystemName(configuration.Region));
+            _bucketName = configuration.BucketName;
     }
 
     public AwsFileSystemManager(IConfiguration configuration)
@@ -30,33 +35,198 @@ public class AwsFileSystemManager : IFileSystemBase
         _rootPath = configuration["JadedFileSystemConfig:RootPath"].ToString();
     }
 
-    public Task<bool> DeleteDirectoryAsync(string relativeDirectoryPath)
+    public async Task<bool> DeleteDirectoryAsync(string relativeDirectoryPath)
     {
-        throw new NotImplementedException();
+        try
+        {
+            // Ensure the directory path ends with a '/' to represent a folder structure in S3
+            if (!relativeDirectoryPath.EndsWith("/"))
+            {
+                relativeDirectoryPath += "/";
+            }
+
+            // List all objects with the specified prefix (directoryPath)
+            var listRequest = new ListObjectsV2Request
+            {
+                BucketName = _bucketName,
+                Prefix = relativeDirectoryPath
+            };
+
+            ListObjectsV2Response listResponse;
+            do
+            {
+                listResponse = await _s3Client.ListObjectsV2Async(listRequest);
+
+                // Delete the objects found with the specified prefix
+                foreach (var s3Object in listResponse.S3Objects)
+                {
+                    await _s3Client.DeleteObjectAsync(new Amazon.S3.Model.DeleteObjectRequest
+                    {
+                        BucketName = _bucketName,
+                        Key = s3Object.Key
+                    });
+                }
+
+                // Set the continuation token to continue listing more objects
+                listRequest.ContinuationToken = listResponse.NextContinuationToken;
+            } while (listResponse.IsTruncated); // Continue while there are more objects to list
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // Log the exception
+            return false;
+        }
     }
 
-    public Task<bool> DeleteFileAsync(string relativeFilePath)
+    public async Task<bool> DeleteFileAsync(string relativeFilePath)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var deleteRequest = new Amazon.S3.Model.DeleteObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = relativeFilePath
+            };
+            var response = await _s3Client.DeleteObjectAsync(deleteRequest);
+            return response.HttpStatusCode == System.Net.HttpStatusCode.NoContent;
+        }
+        catch (Exception ex)
+        {
+            // Log exception
+            return false;
+        }
     }
 
-    public Task<AssetTypes> GetFileAsync(string relativeFilePath)
+    public async Task<AssetTypes> GetFileAsync(string relativeFilePath)
     {
-        throw new NotImplementedException();
+        try
+        {
+            // Get the object from S3
+            var response = await _s3Client.GetObjectAsync(_bucketName, relativeFilePath);
+
+            // Create an instance of AssetTypes and map the properties
+            var asset = new AssetTypes
+            {
+                Name = System.IO.Path.GetFileName(relativeFilePath),
+                IsFolder = false, // Assuming this method is only used for files
+                Path = relativeFilePath,
+                Extension = System.IO.Path.GetExtension(relativeFilePath),
+                MimeType = response.Headers.ContentType,
+                SizeInBytes = (int)response.ResponseStream.Length, // Be cautious with large files
+                DateCreated = response.Metadata["x-amz-meta-datecreated"] != null ? DateTime.Parse(response.Metadata["x-amz-meta-datecreated"]) : DateTime.MinValue,
+                DateModified = response.LastModified
+            };
+
+            return asset;
+        }
+        catch (AmazonS3Exception ex)
+        {
+            // Handle specific S3 exceptions
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Handle other exceptions
+            throw;
+        }
     }
 
-    public Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "/", string searchKey = "")
+    public async Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "/", string searchKey = "")
     {
-        throw new NotImplementedException();
+        var client = new AmazonS3Client();
+        var request = new ListObjectsV2Request
+        {
+            BucketName = "your-bucket-name",
+            Prefix = relativePath.TrimStart('/'),
+            ContinuationToken = null
+        };
+
+        var assets = new List<AssetTypes>();
+
+        ListObjectsV2Response response;
+        do
+        {
+            response = await client.ListObjectsV2Async(request);
+            foreach (var obj in response.S3Objects)
+            {
+                if (string.IsNullOrEmpty(searchKey) || obj.Key.Contains(searchKey))
+                {
+                    assets.Add(new AssetTypes()
+                    {
+                        Name = System.IO.Path.GetFileName(relativeFilePath),
+                        IsFolder = false, // Assuming this method is only used for files
+                        Path = relativeFilePath,
+                        Extension = System.IO.Path.GetExtension(relativeFilePath),
+                        MimeType = response.Headers.ContentType,
+                        SizeInBytes = (int)response.ResponseStream.Length, // Be cautious with large files
+                        DateCreated = response.Metadata["x-amz-meta-datecreated"] != null ? DateTime.Parse(response.Metadata["x-amz-meta-datecreated"]) : DateTime.MinValue,
+                        DateModified = response.LastModified
+                    });
+            }
+            request.ContinuationToken = response.NextContinuationToken;
+        } while (response.IsTruncated);
+
+        return assets;
     }
 
-    public Task<IEnumerable<AssetTypes>> ListFilesPaged(string relativePath, int currentPage, string searchKey = "", int pageSize = 0)
+    public async Task<IEnumerable<AssetTypes>> ListFilesPaged(string relativePath, int currentPage, string searchKey = "", int pageSize = 0)
     {
-        throw new NotImplementedException();
+        var client = new AmazonS3Client();
+        var request = new ListObjectsV2Request
+        {
+            BucketName = "your-bucket-name",
+            Prefix = relativePath.TrimStart('/'),
+            MaxKeys = pageSize,
+            ContinuationToken = null
+        };
+
+        var assets = new List<AssetTypes>();
+        int pageCounter = 0;
+
+        ListObjectsV2Response response;
+        do
+        {
+            response = await client.ListObjectsV2Async(request);
+            if (pageCounter == currentPage)
+            {
+                foreach (var obj in response.S3Objects)
+                {
+                    if (string.IsNullOrEmpty(searchKey) || obj.Key.Contains(searchKey))
+                    {
+                        assets.Add(new AssetTypes { /* Populate your AssetTypes object based on the S3 object */ });
+                    }
+                }
+                break;
+            }
+            request.ContinuationToken = response.NextContinuationToken;
+            pageCounter++;
+        } while (response.IsTruncated && pageCounter <= currentPage);
+
+        return assets;
     }
 
-    public Task<bool> UploadFileAsync(byte[] fileContent, string relativeDestinationPath)
+    public async Task<bool> UploadFileAsync(byte[] fileContent, string relativeDestinationPath)
     {
-        throw new NotImplementedException();
+        try
+        {
+            using (var stream = new MemoryStream(fileContent))
+            {
+                var putRequest = new Amazon.S3.Model.PutObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = relativeDestinationPath,
+                    InputStream = stream
+                };
+                var response = await _s3Client.PutObjectAsync(putRequest);
+                return response.HttpStatusCode == System.Net.HttpStatusCode.OK;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log exception
+            return false;
+        }
     }
 }
