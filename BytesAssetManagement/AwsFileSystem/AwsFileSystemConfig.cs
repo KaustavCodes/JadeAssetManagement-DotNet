@@ -1,6 +1,6 @@
-using JadedAssetManagement.FileSystem;
+using BytesAssetManagement.FileSystem;
 
-namespace JadedAssetManagement.AwsFileSystem;
+namespace BytesAssetManagement.AwsFileSystem;
 
 public class AwsFileSystemConfig: FileSystemConfig
 {

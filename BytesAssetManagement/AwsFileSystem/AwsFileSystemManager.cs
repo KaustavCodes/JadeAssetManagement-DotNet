@@ -1,9 +1,9 @@
-using JadedAssetManagement.Base;
+using BytesAssetManagement.Base;
 using Microsoft.Extensions.Configuration;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-namespace JadedAssetManagement.AwsFileSystem;
+namespace BytesAssetManagement.AwsFileSystem;
 
 public class AwsFileSystemManager : IFileSystemBase
 {
@@ -135,11 +135,12 @@ public class AwsFileSystemManager : IFileSystemBase
 
     public async Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "/", string searchKey = "")
     {
+        var path = Path.Combine(_rootPath, relativePath);
         var client = new AmazonS3Client();
         var request = new ListObjectsV2Request
         {
             BucketName = "your-bucket-name",
-            Prefix = relativePath.TrimStart('/'),
+            Prefix = path.TrimStart('/'),
             ContinuationToken = null
         };
 
@@ -155,15 +156,16 @@ public class AwsFileSystemManager : IFileSystemBase
                 {
                     assets.Add(new AssetTypes()
                     {
-                        Name = System.IO.Path.GetFileName(relativeFilePath),
+                        Name = System.IO.Path.GetFileName(path),
                         IsFolder = false, // Assuming this method is only used for files
-                        Path = relativeFilePath,
-                        Extension = System.IO.Path.GetExtension(relativeFilePath),
+                        Path = path,
+                        Extension = System.IO.Path.GetExtension(path),
                         MimeType = response.Headers.ContentType,
                         SizeInBytes = (int)response.ResponseStream.Length, // Be cautious with large files
                         DateCreated = response.Metadata["x-amz-meta-datecreated"] != null ? DateTime.Parse(response.Metadata["x-amz-meta-datecreated"]) : DateTime.MinValue,
                         DateModified = response.LastModified
                     });
+                }
             }
             request.ContinuationToken = response.NextContinuationToken;
         } while (response.IsTruncated);
@@ -173,11 +175,12 @@ public class AwsFileSystemManager : IFileSystemBase
 
     public async Task<IEnumerable<AssetTypes>> ListFilesPaged(string relativePath, int currentPage, string searchKey = "", int pageSize = 0)
     {
+        var path = Path.Combine(_rootPath, relativePath);
         var client = new AmazonS3Client();
         var request = new ListObjectsV2Request
         {
             BucketName = "your-bucket-name",
-            Prefix = relativePath.TrimStart('/'),
+            Prefix = path.TrimStart('/'),
             MaxKeys = pageSize,
             ContinuationToken = null
         };
@@ -209,6 +212,7 @@ public class AwsFileSystemManager : IFileSystemBase
 
     public async Task<bool> UploadFileAsync(byte[] fileContent, string relativeDestinationPath)
     {
+        var path = Path.Combine(_rootPath, relativeDestinationPath);
         try
         {
             using (var stream = new MemoryStream(fileContent))
@@ -216,7 +220,7 @@ public class AwsFileSystemManager : IFileSystemBase
                 var putRequest = new Amazon.S3.Model.PutObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = relativeDestinationPath,
+                    Key = path,
                     InputStream = stream
                 };
                 var response = await _s3Client.PutObjectAsync(putRequest);

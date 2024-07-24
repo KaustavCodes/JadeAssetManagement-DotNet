@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\JadedAssetManagement\JadedAssetManagement.csproj" />
+    <ProjectReference Include="..\BytesAssetManagement\BytesAssetManagement.csproj" />
   </ItemGroup>
 
   <ItemGroup>

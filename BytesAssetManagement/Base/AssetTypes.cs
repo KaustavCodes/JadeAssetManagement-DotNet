@@ -1,4 +1,4 @@
-﻿namespace JadedAssetManagement.Base;
+﻿namespace BytesAssetManagement.Base;
 
 public class AssetTypes
 {
