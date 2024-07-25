@@ -5,14 +5,17 @@ using Microsoft.Extensions.Configuration;
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Jaded File Manager!");
 
-var configuration = new FileSystemConfig()
-{
-    PageSize = 20,
-    RootPath = Path.Combine(Directory.GetCurrentDirectory(), "Files")
-};
 
-FileSystemManager fileSystemManager = new(configuration);
+//File System Testing
+// var configuration = new FileSystemConfig()
+// {
+//     PageSize = 20,
+//     RootPath = Path.Combine(Directory.GetCurrentDirectory(), "Files")
+// };
 
+// FileSystemManager fileSystemManager = new(configuration);
+
+//Initializing via IConfiguration
 var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)

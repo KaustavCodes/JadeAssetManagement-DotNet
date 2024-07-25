@@ -133,6 +133,12 @@ public class AwsFileSystemManager : IFileSystemBase
         }
     }
 
+    /// <summary>
+    /// List all files in the specified directory. Here we do not provide Created Date, Modified Date, and Size to avoid unnecessary S3 requests.
+    /// </summary>
+    /// <param name="relativePath">Path after the root path already provided after initialization.</param>
+    /// <param name="searchKey">Filter the records by this search keyword</param>
+    /// <returns></returns>
     public async Task<IEnumerable<AssetTypes>> ListFilesAllFiles(string relativePath = "/", string searchKey = "")
     {
         var path = Path.Combine(_rootPath, relativePath);
@@ -154,16 +160,17 @@ public class AwsFileSystemManager : IFileSystemBase
             {
                 if (string.IsNullOrEmpty(searchKey) || obj.Key.Contains(searchKey))
                 {
+                    string extension = System.IO.Path.GetExtension(path);
                     assets.Add(new AssetTypes()
                     {
                         Name = System.IO.Path.GetFileName(path),
                         IsFolder = false, // Assuming this method is only used for files
                         Path = path,
-                        Extension = System.IO.Path.GetExtension(path),
-                        MimeType = response.Headers.ContentType,
-                        SizeInBytes = (int)response.ResponseStream.Length, // Be cautious with large files
-                        DateCreated = response.Metadata["x-amz-meta-datecreated"] != null ? DateTime.Parse(response.Metadata["x-amz-meta-datecreated"]) : DateTime.MinValue,
-                        DateModified = response.LastModified
+                        Extension = extension,
+                        MimeType = Helpers.GetMimeType(extension),
+                        SizeInBytes = -1, // Be cautious with large files
+                        DateCreated = DateTime.MinValue,
+                        DateModified = DateTime.MinValue
                     });
                 }
             }
