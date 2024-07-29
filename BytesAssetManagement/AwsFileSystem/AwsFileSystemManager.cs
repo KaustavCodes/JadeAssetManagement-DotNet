@@ -11,7 +11,7 @@ public class AwsFileSystemManager : IFileSystemBase
     private readonly string _bucketName;
     private int _pageSize = 10;
 
-    private string _rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+    private string _rootPath = "";
 
     /// <summary>
     /// This constructor accepts a dynamic object and expects a parameter called PageSize.
@@ -33,6 +33,7 @@ public class AwsFileSystemManager : IFileSystemBase
     {
         _pageSize = Convert.ToInt32(configuration["JadedFileSystemConfig:PageSize"]);
         _rootPath = configuration["JadedFileSystemConfig:RootPath"].ToString();
+        _s3Client = new AmazonS3Client(configuration["JadedFileSystemConfig:AccessKey"], configuration["JadedFileSystemConfig:SecretKey"], Amazon.RegionEndpoint.GetBySystemName(configuration["JadedFileSystemConfig:Region"]));
     }
 
     public async Task<bool> DeleteDirectoryAsync(string relativeDirectoryPath)
