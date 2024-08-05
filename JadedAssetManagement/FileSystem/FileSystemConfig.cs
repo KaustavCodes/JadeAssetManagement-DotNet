@@ -1,6 +1,6 @@
-using BytesAssetManagement.FileSystem;
+using JadedAssetManagement.FileSystem;
 
-namespace BytesAssetManagement.FileSystem;
+namespace JadedAssetManagement.FileSystem;
 
 public class FileSystemConfig
 {

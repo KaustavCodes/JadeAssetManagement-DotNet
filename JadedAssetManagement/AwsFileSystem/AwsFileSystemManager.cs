@@ -1,9 +1,9 @@
-using BytesAssetManagement.Base;
+using JadedAssetManagement.Base;
 using Microsoft.Extensions.Configuration;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-namespace BytesAssetManagement.AwsFileSystem;
+namespace JadedAssetManagement.AwsFileSystem;
 
 public class AwsFileSystemManager : IFileSystemBase
 {

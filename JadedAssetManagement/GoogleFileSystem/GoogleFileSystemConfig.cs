@@ -1,6 +1,6 @@
-﻿using BytesAssetManagement.FileSystem;
+﻿using JadedAssetManagement.FileSystem;
 
-namespace BytesAssetManagement.GoogleFileSystem;
+namespace JadedAssetManagement.GoogleFileSystem;
 
 public class GoogleFileSystemConfig: FileSystemConfig
 {

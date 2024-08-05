@@ -1,7 +1,7 @@
-﻿using BytesAssetManagement.Base;
+﻿using JadedAssetManagement.Base;
 using Microsoft.Extensions.Configuration;
 
-namespace BytesAssetManagement.FileSystem;
+namespace JadedAssetManagement.FileSystem;
 
 public class FileSystemManager : IFileSystemBase
 {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace BytesAssetManagement.Base;
+namespace JadedAssetManagement.Base;
 
 public interface IFileSystemBase
 {

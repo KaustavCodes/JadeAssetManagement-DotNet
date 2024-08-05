@@ -1,5 +1,5 @@
-﻿using BytesAssetManagement.Base;
-using BytesAssetManagement.FileSystem;
+﻿using JadedAssetManagement.Base;
+using JadedAssetManagement.FileSystem;
 using Microsoft.Extensions.Configuration;
 
 // See https://aka.ms/new-console-template for more information
