@@ -1,5 +1,6 @@
 
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using JadedAssetManagement.Base;
 using Microsoft.Extensions.Configuration;
 
